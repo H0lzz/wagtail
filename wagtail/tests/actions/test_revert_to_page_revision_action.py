@@ -1,4 +1,4 @@
-import pytest
+import unittest
 from wagtail.actions.revert_to_page_revision import (
     RevertToPageRevisionAction,
     RevertToPageRevisionError,
@@ -6,7 +6,7 @@ from wagtail.actions.revert_to_page_revision import (
 )
 from unittest.mock import Mock
 
-class TestRevertToPageRevisionAction:
+class TestRevertToPageRevisionAction(unittest.TestCase):
     # CT1: Sem permissão para editar a página e revisão não necessária
     def test_no_permission_and_revision_not_needed(self):
         page = Mock(alias_of_id=None)
@@ -21,7 +21,7 @@ class TestRevertToPageRevisionAction:
             user=user,
         )
 
-        with pytest.raises(RevertToPageRevisionPermissionError):
+        with self.assertRaises(RevertToPageRevisionPermissionError):
             action.check(skip_permission_checks=False)
     
     # CT2: Com permissão para editar a página e revisão não necessária
@@ -38,7 +38,6 @@ class TestRevertToPageRevisionAction:
             user=user,
         )
 
-        # Não deve lançar exceção
         action.check(skip_permission_checks=False)
     
     # CT3: Com permissão e ignorando verificações de permissão
@@ -52,7 +51,6 @@ class TestRevertToPageRevisionAction:
             user=user,
         )
 
-        # Não deve lançar exceção mesmo sem permissões
         action.check(skip_permission_checks=True)
     
     # CT4: Revisão necessária para página que é alias
@@ -65,5 +63,5 @@ class TestRevertToPageRevisionAction:
             user=None,
         )
 
-        with pytest.raises(RevertToPageRevisionError):
+        with self.assertRaises(RevertToPageRevisionError):
             action.check(skip_permission_checks=False)
